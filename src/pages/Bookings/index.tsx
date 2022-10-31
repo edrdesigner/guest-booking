@@ -70,10 +70,12 @@ export function Bookings() {
           </tbody>
         </BookingsTable>
       </BookingsContainer>
-      <Dialog.Root open={openModal} onOpenChange={setOpenModal}>
-        <Dialog.Trigger />
-        {openModal ? <BookingModal entity={booking} onClose={() => setOpenModal(false)} /> : null}
-      </Dialog.Root>
+      {openModal ? (
+        <Dialog.Root open={openModal} onOpenChange={setOpenModal}>
+          <Dialog.Trigger />
+          <BookingModal entity={booking} onClose={() => setOpenModal(false)} />
+        </Dialog.Root>
+      ) : null}
     </div>
   );
 }

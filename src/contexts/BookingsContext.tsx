@@ -66,7 +66,9 @@ export function BookingsProvider({ children }: BookingProviderProps) {
     });
 
     if (isOverlapping) {
-      throw new Error('Date range is overlapping');
+      throw new Error(
+        'The selected dates are not available for this property'
+      );
     }
 
     if (id) {
