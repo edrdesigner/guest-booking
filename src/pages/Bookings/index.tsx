@@ -2,11 +2,10 @@ import { useContext, useState } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { format, formatDistance } from 'date-fns';
 import { Pencil, Trash } from 'phosphor-react';
-
 import { Header } from '../../components/Header';
+import { BookingModal } from '../../components/BookingModal';
 import { Booking, BookingContext } from '../../contexts/BookingsContext';
 import { BookingsContainer, BookingsTable } from './styles';
-import { BookingModal } from '../../components/BookingModal';
 
 export function Bookings() {
   const { bookings, deleteBooking } = useContext(BookingContext);

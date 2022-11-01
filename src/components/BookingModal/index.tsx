@@ -4,9 +4,10 @@ import { X } from 'phosphor-react';
 import * as z from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { addDays, isValid } from 'date-fns';
+import { addDays, isBefore, isValid } from 'date-fns';
 import { format } from 'date-fns-tz';
 import { Booking, BookingContext } from '../../contexts/BookingsContext';
+import { Input } from '../Input';
 import { CloseButton, Content, Overlay } from './styles';
 
 const bookingFormSchema = z.object({
@@ -64,7 +65,9 @@ export function BookingModal({ entity, onClose }: BookingModalProps) {
         adults,
       });
 
-      onClose();
+      if (typeof onClose === 'function') {
+        onClose();
+      }
     } catch (error: Error | any) {
       if (error?.message) {
         setFormError(error.message);
@@ -72,7 +75,17 @@ export function BookingModal({ entity, onClose }: BookingModalProps) {
     }
   }
 
-  const minDate = new Date().toISOString().split('T')[0];
+  const minDate = useMemo(() => {
+    if (
+      entity?.id &&
+      entity.checkIn &&
+      isBefore(new Date(entity.checkIn), new Date())
+    ) {
+      return new Date(entity.checkIn).toISOString().split('T')[0];
+    }
+
+    return new Date().toISOString().split('T')[0];
+  }, [entity?.id]);
 
   const checkIn = watch('checkIn');
   const minDateCheckout =
@@ -92,40 +105,33 @@ export function BookingModal({ entity, onClose }: BookingModalProps) {
         </CloseButton>
         <form onSubmit={handleSubmit(handleSaveBooking)}>
           {formError && <span>{formError}</span>}
-
-          <label>Property</label>
-          <input
+          <Input
+            label="Property"
             type="text"
             placeholder="Property"
-            className={errors.property ? 'has-error' : ''}
+            error={errors?.property?.message}
             {...register('property')}
           />
-          {errors?.property && <span>{errors.property.message}</span>}
-          <label>Check In</label>
-          <input
+          <Input
+            label="Check in"
             type="date"
-            placeholder="Check in"
             min={minDate}
+            error={errors?.checkIn?.message}
             {...register('checkIn', { valueAsDate: true })}
           />
-          {errors?.checkIn && <span>{errors.checkIn.message}</span>}
-          <label>Check Out</label>
-          <input
+          <Input
+            label="Check out"
             type="date"
-            lang="en-GB"
+            error={errors?.checkOut?.message}
             min={minDateCheckout}
-            placeholder="Check out"
             {...register('checkOut', { valueAsDate: true })}
           />
-          {errors?.checkOut && <span>{errors.checkOut.message}</span>}
-          <label>Adults</label>
-          <input
+          <Input
+            label="Adults"
             type="number"
-            placeholder="Adults"
-            className={errors.adults ? 'has-error' : ''}
+            error={errors?.adults?.message}
             {...register('adults', { valueAsNumber: true })}
           />
-          {errors?.adults && <span>{errors.adults.message}</span>}
           <button type="submit" disabled={isSubmitting}>
             {entity?.id ? 'Save' : 'Book now'}
           </button>
